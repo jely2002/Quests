@@ -24,18 +24,18 @@ import java.util.List;
 
 public abstract class QuestsStringPrompt extends StringPrompt {
     private static final HandlerList HANDLERS = new HandlerList();
-    
+
     public QuestsStringPrompt() {
     }
-    
+
     public String getName() {
         return getClass().getSimpleName();
     }
-    
+
     public HandlerList getHandlers() {
         return HANDLERS;
     }
-     
+
     public static HandlerList getHandlerList() {
         return HANDLERS;
     }
@@ -45,7 +45,7 @@ public abstract class QuestsStringPrompt extends StringPrompt {
      * style, and decides how to deliver the result. Players are sent
      * clickable text, all others (i.e. console) are sent plain text,
      * which is returned to be delivered through the Conversations API.
-     * 
+     *
      * @param header  the menu header
      * @param list    a list of strings to display
      * @param footer  the menu footer
@@ -53,7 +53,7 @@ public abstract class QuestsStringPrompt extends StringPrompt {
      * @return        plain text to deliver
      */
     protected String sendClickableMenu(final String header, final List<String> list, final String footer,
-                                       final Conversable forWhom) {
+                                       final Conversable forWhom, final boolean conversationWorkaround) {
         if (!(forWhom instanceof Player)) {
             return ChatColor.GOLD + header + "\n" + ChatColor.AQUA + String.join(ChatColor.GRAY + ", " + ChatColor.AQUA, list) + "\n" + ChatColor.YELLOW + footer;
         }
@@ -66,7 +66,8 @@ public abstract class QuestsStringPrompt extends StringPrompt {
         for (int i = 0; i < list.size(); i++) {
             final TextComponent questName = new TextComponent(list.get(i));
             questName.setColor(ChatColor.AQUA);
-            questName.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, list.get(i)));
+            String command = (conversationWorkaround ? "/quests chat " : "") + list.get(i);
+            questName.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command));
             component.addExtra(questName);
             if (i < (list.size() - 1)) {
                 component.addExtra(separator);

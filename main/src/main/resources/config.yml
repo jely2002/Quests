@@ -36,4 +36,5 @@ trial-save: false
 top-limit: 150
 translate-names: true
 translate-subcommands: false
+bungeechat-conversation-fix: false
 update-check: true

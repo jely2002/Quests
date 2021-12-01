@@ -36,28 +36,28 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ConditionMenuPrompt extends ConditionsEditorNumericPrompt {
-    
+
     private final Quests plugin;
-    
+
     public ConditionMenuPrompt(final ConversationContext context) {
         super(context);
         this.plugin = (Quests)context.getPlugin();
     }
 
     private final int size = 4;
-    
+
     @Override
     public int getSize() {
         return size;
     }
-    
+
     @Override
     public String getTitle(final ConversationContext context) {
         final String title = Lang.get("conditionEditorTitle");
         return title + (plugin.hasLimitedAccess(context.getForWhom()) ? ChatColor.RED + " (" + Lang.get("trialMode")
                 + ")" : "");
     }
-    
+
     @Override
     public ChatColor getNumberColor(final ConversationContext context, final int number) {
         switch (number) {
@@ -71,7 +71,7 @@ public class ConditionMenuPrompt extends ConditionsEditorNumericPrompt {
             return null;
         }
     }
-    
+
     @Override
     public String getSelectionText(final ConversationContext context, final int number) {
         switch (number) {
@@ -87,7 +87,7 @@ public class ConditionMenuPrompt extends ConditionsEditorNumericPrompt {
             return null;
         }
     }
-    
+
     @Override
     public String getAdditionalText(final ConversationContext context, final int number) {
         return null;
@@ -95,10 +95,10 @@ public class ConditionMenuPrompt extends ConditionsEditorNumericPrompt {
 
     @Override
     public @NotNull String getBasicPromptText(final @NotNull ConversationContext context) {
-        final ConditionsEditorPostOpenNumericPromptEvent event 
+        final ConditionsEditorPostOpenNumericPromptEvent event
                 = new ConditionsEditorPostOpenNumericPromptEvent(context, this);
         plugin.getServer().getPluginManager().callEvent(event);
-        
+
         final StringBuilder text = new StringBuilder(ChatColor.GOLD + getTitle(context));
         for (int i = 1; i <= size; i++) {
             text.append("\n").append(getNumberColor(context, i)).append(ChatColor.BOLD).append(i)
@@ -122,7 +122,7 @@ public class ConditionMenuPrompt extends ConditionsEditorNumericPrompt {
         case 2:
             if (cs.hasPermission("quests.conditions.edit")) {
                 if (plugin.getLoadedConditions().isEmpty()) {
-                    context.getForWhom().sendRawMessage(ChatColor.YELLOW 
+                    context.getForWhom().sendRawMessage(ChatColor.YELLOW
                             + Lang.get("conditionEditorNoneToEdit"));
                     return new ConditionMenuPrompt(context);
                 } else {
@@ -135,7 +135,7 @@ public class ConditionMenuPrompt extends ConditionsEditorNumericPrompt {
         case 3:
             if (cs.hasPermission("quests.conditions.delete")) {
                 if (plugin.getLoadedConditions().isEmpty()) {
-                    context.getForWhom().sendRawMessage(ChatColor.YELLOW 
+                    context.getForWhom().sendRawMessage(ChatColor.YELLOW
                             + Lang.get("conditionEditorNoneToDelete"));
                     return new ConditionMenuPrompt(context);
                 } else {
@@ -152,9 +152,9 @@ public class ConditionMenuPrompt extends ConditionsEditorNumericPrompt {
             return new ConditionMenuPrompt(context);
         }
     }
-    
+
     public class ConditionSelectCreatePrompt extends ConditionsEditorStringPrompt {
-        
+
         public ConditionSelectCreatePrompt(final ConversationContext context) {
             super(context);
         }
@@ -163,7 +163,7 @@ public class ConditionMenuPrompt extends ConditionsEditorNumericPrompt {
         public String getTitle(final ConversationContext context) {
             return Lang.get("conditionCreateTitle");
         }
-        
+
         @Override
         public String getQueryText(final ConversationContext context) {
             return Lang.get("conditionEditorEnterName");
@@ -171,7 +171,7 @@ public class ConditionMenuPrompt extends ConditionsEditorNumericPrompt {
 
         @Override
         public @NotNull String getPromptText(final @NotNull ConversationContext context) {
-            final ConditionsEditorPostOpenStringPromptEvent event 
+            final ConditionsEditorPostOpenStringPromptEvent event
                     = new ConditionsEditorPostOpenStringPromptEvent(context, this);
             plugin.getServer().getPluginManager().callEvent(event);
 
@@ -216,16 +216,16 @@ public class ConditionMenuPrompt extends ConditionsEditorNumericPrompt {
     }
 
     public class ConditionSelectEditPrompt extends ConditionsEditorStringPrompt {
-        
+
         public ConditionSelectEditPrompt(final ConversationContext context) {
             super(context);
         }
-        
+
         @Override
         public String getTitle(final ConversationContext context) {
             return Lang.get("conditionEditTitle");
         }
-        
+
         @Override
         public String getQueryText(final ConversationContext context) {
             return Lang.get("conditionEditorEnterName");
@@ -233,11 +233,11 @@ public class ConditionMenuPrompt extends ConditionsEditorNumericPrompt {
 
         @Override
         public @NotNull String getPromptText(final @NotNull ConversationContext context) {
-            final ConditionsEditorPostOpenStringPromptEvent event 
+            final ConditionsEditorPostOpenStringPromptEvent event
                     = new ConditionsEditorPostOpenStringPromptEvent(context, this);
             plugin.getServer().getPluginManager().callEvent(event);
             final List<String> names = plugin.getLoadedConditions().stream().map(Condition::getName).collect(Collectors.toList());
-            return sendClickableMenu(getTitle(context), names, getQueryText(context), context.getForWhom());
+            return sendClickableMenu(getTitle(context), names, getQueryText(context), context.getForWhom(), plugin.getConfig().getBoolean("bungeechat-conversation-fix"));
         }
 
         @Override
@@ -260,30 +260,30 @@ public class ConditionMenuPrompt extends ConditionsEditorNumericPrompt {
             }
         }
     }
-    
+
     public class ConditionSelectDeletePrompt extends ConditionsEditorStringPrompt {
 
         public ConditionSelectDeletePrompt(final ConversationContext context) {
             super(context);
         }
-        
+
         @Override
         public String getTitle(final ConversationContext context) {
             return Lang.get("conditionDeleteTitle");
         }
-        
+
         @Override
         public String getQueryText(final ConversationContext context) {
             return Lang.get("conditionEditorEnterName");
         }
-        
+
         @Override
         public @NotNull String getPromptText(final @NotNull ConversationContext context) {
-            final ConditionsEditorPostOpenStringPromptEvent event 
+            final ConditionsEditorPostOpenStringPromptEvent event
                     = new ConditionsEditorPostOpenStringPromptEvent(context, this);
             plugin.getServer().getPluginManager().callEvent(event);
             final List<String> names = plugin.getLoadedConditions().stream().map(Condition::getName).collect(Collectors.toList());
-            return sendClickableMenu(getTitle(context), names, getQueryText(context), context.getForWhom());
+            return sendClickableMenu(getTitle(context), names, getQueryText(context), context.getForWhom(), plugin.getConfig().getBoolean("bungeechat-conversation-fix"));
         }
 
         @Override
@@ -297,7 +297,7 @@ public class ConditionMenuPrompt extends ConditionsEditorNumericPrompt {
                 if (c != null) {
                     for (final Quest quest : plugin.getLoadedQuests()) {
                         for (final Stage stage : quest.getStages()) {
-                            if (stage.getCondition() != null 
+                            if (stage.getCondition() != null
                                     && stage.getCondition().getName().equalsIgnoreCase(c.getName())) {
                                 used.add(quest.getName());
                                 break;
@@ -308,12 +308,12 @@ public class ConditionMenuPrompt extends ConditionsEditorNumericPrompt {
                         context.setSessionData(CK.ED_CONDITION_DELETE, c.getName());
                         return new ConditionConfirmDeletePrompt(context);
                     } else {
-                        context.getForWhom().sendRawMessage(ChatColor.RED + Lang.get("conditionEditorInUse") 
+                        context.getForWhom().sendRawMessage(ChatColor.RED + Lang.get("conditionEditorInUse")
                         + " \"" + ChatColor.DARK_PURPLE + c.getName() + ChatColor.RED + "\":");
                         for (final String s : used) {
                             context.getForWhom().sendRawMessage(ChatColor.RED + "- " + ChatColor.DARK_RED + s);
                         }
-                        context.getForWhom().sendRawMessage(ChatColor.RED 
+                        context.getForWhom().sendRawMessage(ChatColor.RED
                                 + Lang.get("eventEditorMustModifyQuests"));
                         return new ConditionSelectDeletePrompt(context);
                     }
@@ -327,22 +327,22 @@ public class ConditionMenuPrompt extends ConditionsEditorNumericPrompt {
     }
 
     public class ConditionConfirmDeletePrompt extends ConditionsEditorStringPrompt {
-        
+
         public ConditionConfirmDeletePrompt(final ConversationContext context) {
             super(context);
         }
-        
+
         private final int size = 2;
-        
+
         public int getSize() {
             return size;
         }
-        
+
         @Override
         public String getTitle(final ConversationContext context) {
             return null;
         }
-        
+
         public ChatColor getNumberColor(final ConversationContext context, final int number) {
             switch (number) {
             case 1:
@@ -353,7 +353,7 @@ public class ConditionMenuPrompt extends ConditionsEditorNumericPrompt {
                 return null;
             }
         }
-        
+
         public String getSelectionText(final ConversationContext context, final int number) {
             switch (number) {
             case 1:
@@ -364,25 +364,25 @@ public class ConditionMenuPrompt extends ConditionsEditorNumericPrompt {
                 return null;
             }
         }
-        
+
         @Override
         public String getQueryText(final ConversationContext context) {
             return Lang.get("confirmDelete");
         }
-        
+
         @Override
         public @NotNull String getPromptText(final @NotNull ConversationContext context) {
-            final ConditionsEditorPostOpenStringPromptEvent event 
+            final ConditionsEditorPostOpenStringPromptEvent event
                     = new ConditionsEditorPostOpenStringPromptEvent(context, this);
             plugin.getServer().getPluginManager().callEvent(event);
-            
+
             final StringBuilder text = new StringBuilder(ChatColor.RED + getQueryText(context) + " (" + ChatColor.YELLOW
                     + context.getSessionData(CK.ED_CONDITION_DELETE) + ChatColor.RED + ")\n");
             for (int i = 1; i <= size; i++) {
                 text.append("\n").append(getNumberColor(context, i)).append(ChatColor.BOLD).append(i)
                         .append(ChatColor.RESET).append(" - ").append(getSelectionText(context, i));
             }
-            return QuestsNumericPrompt.sendClickableSelection(text.toString(), context.getForWhom());
+            return QuestsNumericPrompt.sendClickableSelection(text.toString(), context.getForWhom(), plugin.getConfig().getBoolean("bungeechat-conversation-fix"));
         }
 
         @Override

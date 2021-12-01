@@ -31,37 +31,37 @@ public abstract class QuestsNumericPrompt extends NumericPrompt {
 
     public QuestsNumericPrompt() {
     }
-    
+
     public String getName() {
         return getClass().getSimpleName();
     }
-    
+
     public HandlerList getHandlers() {
         return HANDLERS;
     }
-     
+
     public static HandlerList getHandlerList() {
         return HANDLERS;
     }
-    
+
     @Override
     public @NotNull String getPromptText(@NotNull final ConversationContext cc) {
-        return sendClickableSelection(getBasicPromptText(cc), cc.getForWhom());
+        return sendClickableSelection(getBasicPromptText(cc), cc.getForWhom(), cc.getPlugin().getConfig().getBoolean("bungeechat-conversation-fix"));
     }
-    
+
     public abstract String getBasicPromptText(ConversationContext cc);
-    
+
     /**
      * Takes a Quests-styled conversation interface and decides how to send it
      * to the target. Players receive clickable text, others (i.e. console)
      * receive plain text, which is returned to be delivered through the
      * Conversations API.
-     * 
+     *
      * @param input   the Quests-styled conversation interface
-     * @param forWhom the conversation participant 
+     * @param forWhom the conversation participant
      * @return        plain text to deliver
      */
-    public static String sendClickableSelection(final String input, final Conversable forWhom) {
+    public static String sendClickableSelection(final String input, final Conversable forWhom, final boolean conversationWorkaround) {
         if (!(forWhom instanceof Player)) {
             return input;
         }
@@ -72,7 +72,8 @@ public abstract class QuestsNumericPrompt extends NumericPrompt {
             final Matcher matcher = NUMBER_PATTERN.matcher(ChatColor.stripColor(line));
             final TextComponent lineComponent = new TextComponent(TextComponent.fromLegacyText(line));
             if (matcher.find()) {
-                lineComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, matcher.group(1)));
+                String command = (conversationWorkaround ? "/quests chat " : "") +  matcher.group(1);
+                lineComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command));
             }
             if (first) {
                 first = false;

@@ -34,28 +34,28 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class QuestMenuPrompt extends QuestsEditorNumericPrompt {
-    
+
     private final Quests plugin;
-    
+
     public QuestMenuPrompt(final ConversationContext context) {
         super(context);
         this.plugin = (Quests)context.getPlugin();
     }
 
     private final int size = 4;
-    
+
     @Override
     public int getSize() {
         return size;
     }
-    
+
     @Override
     public String getTitle(final ConversationContext context) {
         final String title = Lang.get("questEditorTitle");
         return title + (plugin.hasLimitedAccess(context.getForWhom()) ? ChatColor.RED + " (" + Lang.get("trialMode")
                 + ")" : "");
     }
-    
+
     @Override
     public ChatColor getNumberColor(final ConversationContext context, final int number) {
         switch (number) {
@@ -69,7 +69,7 @@ public class QuestMenuPrompt extends QuestsEditorNumericPrompt {
             return null;
         }
     }
-    
+
     @Override
     public String getSelectionText(final ConversationContext context, final int number) {
         switch (number) {
@@ -85,7 +85,7 @@ public class QuestMenuPrompt extends QuestsEditorNumericPrompt {
             return null;
         }
     }
-    
+
     @Override
     public String getAdditionalText(final ConversationContext context, final int number) {
         return null;
@@ -93,7 +93,7 @@ public class QuestMenuPrompt extends QuestsEditorNumericPrompt {
 
     @Override
     public @NotNull String getBasicPromptText(final @NotNull ConversationContext context) {
-        final QuestsEditorPostOpenNumericPromptEvent event 
+        final QuestsEditorPostOpenNumericPromptEvent event
                 = new QuestsEditorPostOpenNumericPromptEvent(context, this);
         plugin.getServer().getPluginManager().callEvent(event);
         final StringBuilder text = new StringBuilder(ChatColor.GOLD + getTitle(context));
@@ -136,9 +136,9 @@ public class QuestMenuPrompt extends QuestsEditorNumericPrompt {
             return new QuestMenuPrompt(context);
         }
     }
-    
+
     public class QuestSelectCreatePrompt extends QuestsEditorStringPrompt {
-        
+
         public QuestSelectCreatePrompt(final ConversationContext context) {
             super(context);
         }
@@ -147,15 +147,15 @@ public class QuestMenuPrompt extends QuestsEditorNumericPrompt {
         public String getTitle(final ConversationContext context) {
             return Lang.get("questCreateTitle");
         }
-        
+
         @Override
         public String getQueryText(final ConversationContext context) {
             return Lang.get("questEditorEnterQuestName");
         }
-        
+
         @Override
         public @NotNull String getPromptText(final @NotNull ConversationContext context) {
-            final QuestsEditorPostOpenStringPromptEvent event 
+            final QuestsEditorPostOpenStringPromptEvent event
                     = new QuestsEditorPostOpenStringPromptEvent(context, this);
             plugin.getServer().getPluginManager().callEvent(event);
 
@@ -200,9 +200,9 @@ public class QuestMenuPrompt extends QuestsEditorNumericPrompt {
             }
         }
     }
-    
+
     public class QuestSelectEditPrompt extends QuestsEditorStringPrompt {
-        
+
         public QuestSelectEditPrompt(final ConversationContext context) {
             super(context);
         }
@@ -211,7 +211,7 @@ public class QuestMenuPrompt extends QuestsEditorNumericPrompt {
         public String getTitle(final ConversationContext context) {
             return Lang.get("questEditTitle");
         }
-        
+
         @Override
         public String getQueryText(final ConversationContext context) {
             return Lang.get("questEditorEnterQuestName");
@@ -219,11 +219,11 @@ public class QuestMenuPrompt extends QuestsEditorNumericPrompt {
 
         @Override
         public @NotNull String getPromptText(final @NotNull ConversationContext context) {
-            final QuestsEditorPostOpenStringPromptEvent event 
+            final QuestsEditorPostOpenStringPromptEvent event
                     = new QuestsEditorPostOpenStringPromptEvent(context, this);
             plugin.getServer().getPluginManager().callEvent(event);
             final List<String> names = plugin.getLoadedQuests().stream().map(Quest::getName).collect(Collectors.toList());
-            return sendClickableMenu(getTitle(context), names, getQueryText(context), context.getForWhom());
+            return sendClickableMenu(getTitle(context), names, getQueryText(context), context.getForWhom(), plugin.getConfig().getBoolean("bungeechat-conversation-fix"));
         }
 
         @Override
@@ -243,7 +243,7 @@ public class QuestMenuPrompt extends QuestsEditorNumericPrompt {
             }
         }
     }
-    
+
     public class QuestSelectDeletePrompt extends QuestsEditorStringPrompt {
 
         public QuestSelectDeletePrompt(final ConversationContext context) {
@@ -254,19 +254,19 @@ public class QuestMenuPrompt extends QuestsEditorNumericPrompt {
         public String getTitle(final ConversationContext context) {
             return Lang.get("questDeleteTitle");
         }
-        
+
         @Override
         public String getQueryText(final ConversationContext context) {
             return Lang.get("questEditorEnterQuestName");
         }
-        
+
         @Override
         public @NotNull String getPromptText(final @NotNull ConversationContext context) {
-            final QuestsEditorPostOpenStringPromptEvent event 
+            final QuestsEditorPostOpenStringPromptEvent event
                     = new QuestsEditorPostOpenStringPromptEvent(context, this);
             plugin.getServer().getPluginManager().callEvent(event);
             final List<String> names = plugin.getLoadedQuests().stream().map(Quest::getName).collect(Collectors.toList());
-            return sendClickableMenu(getTitle(context), names, getQueryText(context), context.getForWhom());
+            return sendClickableMenu(getTitle(context), names, getQueryText(context), context.getForWhom(), plugin.getConfig().getBoolean("bungeechat-conversation-fix"));
         }
 
         @Override
@@ -279,7 +279,7 @@ public class QuestMenuPrompt extends QuestsEditorNumericPrompt {
                 final Quest found = plugin.getQuest(input);
                 if (found != null) {
                     for (final Quest q : plugin.getLoadedQuests()) {
-                        if (q.getRequirements().getNeededQuests().contains(q) 
+                        if (q.getRequirements().getNeededQuests().contains(q)
                                 || q.getRequirements().getBlockQuests().contains(q)) {
                             used.add(q.getName());
                         }
@@ -288,14 +288,14 @@ public class QuestMenuPrompt extends QuestsEditorNumericPrompt {
                         context.setSessionData(CK.ED_QUEST_DELETE, found.getName());
                         return new QuestConfirmDeletePrompt(context);
                     } else {
-                        context.getForWhom().sendRawMessage(ChatColor.RED 
-                                + Lang.get("questEditorQuestAsRequirement1") + " \"" + ChatColor.DARK_PURPLE 
-                                + context.getSessionData(CK.ED_QUEST_DELETE) + ChatColor.RED + "\" " 
+                        context.getForWhom().sendRawMessage(ChatColor.RED
+                                + Lang.get("questEditorQuestAsRequirement1") + " \"" + ChatColor.DARK_PURPLE
+                                + context.getSessionData(CK.ED_QUEST_DELETE) + ChatColor.RED + "\" "
                                 + Lang.get("questEditorQuestAsRequirement2"));
                         for (final String s : used) {
                             context.getForWhom().sendRawMessage(ChatColor.RED + "- " + ChatColor.DARK_RED + s);
                         }
-                        context.getForWhom().sendRawMessage(ChatColor.RED 
+                        context.getForWhom().sendRawMessage(ChatColor.RED
                                 + Lang.get("questEditorQuestAsRequirement3"));
                         return new QuestSelectDeletePrompt(context);
                     }
@@ -307,15 +307,15 @@ public class QuestMenuPrompt extends QuestsEditorNumericPrompt {
             }
         }
     }
-    
+
     public class QuestConfirmDeletePrompt extends QuestsEditorStringPrompt {
-        
+
         public QuestConfirmDeletePrompt(final ConversationContext context) {
             super(context);
         }
-        
+
         private final int size = 2;
-        
+
         public int getSize() {
             return size;
         }
@@ -324,7 +324,7 @@ public class QuestMenuPrompt extends QuestsEditorNumericPrompt {
         public String getTitle(final ConversationContext context) {
             return null;
         }
-        
+
         public ChatColor getNumberColor(final ConversationContext context, final int number) {
             switch (number) {
             case 1:
@@ -335,7 +335,7 @@ public class QuestMenuPrompt extends QuestsEditorNumericPrompt {
                 return null;
             }
         }
-        
+
         public String getSelectionText(final ConversationContext context, final int number) {
             switch (number) {
             case 1:
@@ -346,25 +346,25 @@ public class QuestMenuPrompt extends QuestsEditorNumericPrompt {
                 return null;
             }
         }
-        
+
         @Override
         public String getQueryText(final ConversationContext context) {
             return Lang.get("confirmDelete");
         }
-        
+
         @Override
         public @NotNull String getPromptText(final @NotNull ConversationContext context) {
-            final QuestsEditorPostOpenStringPromptEvent event 
+            final QuestsEditorPostOpenStringPromptEvent event
                     = new QuestsEditorPostOpenStringPromptEvent(context, this);
             plugin.getServer().getPluginManager().callEvent(event);
-            
+
             final StringBuilder text = new StringBuilder(ChatColor.RED + getQueryText(context) + " (" + ChatColor.YELLOW
                     + context.getSessionData(CK.ED_QUEST_DELETE) + ChatColor.RED + ")\n");
             for (int i = 1; i <= size; i++) {
                 text.append("\n").append(getNumberColor(context, i)).append(ChatColor.BOLD).append(i)
                         .append(ChatColor.RESET).append(" - ").append(getSelectionText(context, i));
             }
-            return QuestsNumericPrompt.sendClickableSelection(text.toString(), context.getForWhom());
+            return QuestsNumericPrompt.sendClickableSelection(text.toString(), context.getForWhom(), plugin.getConfig().getBoolean("bungeechat-conversation-fix"));
         }
 
         @Override

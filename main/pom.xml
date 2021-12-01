@@ -7,11 +7,11 @@
         <version>4.1.2</version>
     </parent>
     <artifactId>quests-main</artifactId>
-    
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    
+
     <repositories>
         <repository>
             <!-- CitizensBooks, DungeonsXL, GPS, LocaleLib, mcMMO Classic, PhatLoots -->
@@ -48,7 +48,7 @@
             <url>https://nexus.hc.to/content/repositories/pub_releases/</url>
         </repository>
     </repositories>
-    
+
     <dependencies>
         <dependency>
             <groupId>org.spigotmc</groupId>
@@ -161,11 +161,11 @@
             <version>1.7.30</version>
         </dependency>
     </dependencies>
-    
+
     <build>
         <defaultGoal>clean package install</defaultGoal>
         <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
-        
+
         <resources>
             <resource>
                 <targetPath>.</targetPath>
@@ -190,7 +190,7 @@
                 </includes>
             </resource>
         </resources>
-        
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -224,7 +224,7 @@
                         </configuration>
                     </execution>
                 </executions>
-                
+
                 <configuration>
                     <artifactSet>
                         <includes>
